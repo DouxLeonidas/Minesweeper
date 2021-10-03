@@ -25,7 +25,7 @@ public class Minesweeper extends JFrame {
     loadImages();
     init(rows, cols, mines);
     restart = new JButton("Restart");
-    restart.setBounds(30,3,100,25);
+    restart.setBounds(Cell.SIZE,3,100,25);
     restart.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
         
@@ -58,7 +58,7 @@ public class Minesweeper extends JFrame {
     try {
       numbers = new Image[10];
       numbers[9] = ImageIO.read(getClass().getResource("images/calendario.png"));
-      numbers[9] = numbers[9].getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+      numbers[9] = numbers[9].getScaledInstance(Cell.SIZE, Cell.SIZE, Image.SCALE_SMOOTH);
       
       BufferedImage nums = ImageIO.read(getClass().getResource("images/mayan.png"));
       numbers[0] = nums.getSubimage(0, 0, 86, 108);
@@ -71,7 +71,7 @@ public class Minesweeper extends JFrame {
       numbers[7] = nums.getSubimage(232, 108, 86, 108);
       numbers[8] = nums.getSubimage(347, 108, 86, 108);
       for (int i = 0; i < 9; ++i) {
-        numbers[i] = numbers[i].getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+        numbers[i] = numbers[i].getScaledInstance(Cell.SIZE, Cell.SIZE, Image.SCALE_SMOOTH);
       }
     } catch (Exception ex) {
       System.err.println(ex);
@@ -81,7 +81,7 @@ public class Minesweeper extends JFrame {
   public void fillBoard(Matrix<Cell> board,
       int rows, int cols, int mines)
       throws InvalidNumberOfMines {
-    if (mines >= rows * cols)
+    if (mines > rows * cols)
       throw new InvalidNumberOfMines();
     
     String mayority;
@@ -143,6 +143,7 @@ public class Minesweeper extends JFrame {
           value = Integer.parseInt(nextToMe.getName());
           if (value != 9) {
             value += inc;
+            value = Math.max(0,value);
             nextToMe.setName(Integer.toString(value));
             nextToMe.setHiddenIcon(new ImageIcon(numbers[value]));
           } else {
