@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import javax.swing.JButton;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -16,19 +17,39 @@ public class Minesweeper extends JFrame {
   private Image[] numbers;
   private int emptyCells;
   private boolean showSolution;
+  private JButton restart;
+  private Matrix<Cell> board;
 
   public Minesweeper(int rows, int cols, int mines) 
       throws InvalidNumberOfMines {
     loadImages();
-    Matrix<Cell> board = new Matrix<>();
-    fillBoard(board, rows, cols, mines);
-    printBoard(board, rows, cols);
-    emptyCells = rows * cols - mines;
-    showSolution = false;
+    init(rows, cols, mines);
+    restart = new JButton("Restart");
+    restart.setBounds(30,3,100,25);
+    restart.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        try {
+          init(rows, cols, mines);
+        } catch(InvalidNumberOfMines mines) {
+          System.out.println("Too many mines");
+        }
+      }
+    });
+    this.add(restart);
     this.setTitle("Minesweeper");
     this.setSize(WIDTH,HEIGHT);
     this.setLayout(null);
     this.setVisible(true);
+    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+  }
+
+  public void init(int rows, int cols, int mines) 
+      throws InvalidNumberOfMines {
+    board = new Matrix<>();
+    fillBoard(board, rows, cols, mines);
+    printBoard(board, rows, cols);
+    emptyCells = rows * cols - mines;
+    showSolution = false;
   }
 
   public void loadImages() {
@@ -93,7 +114,6 @@ public class Minesweeper extends JFrame {
             printBoard(board, rows, cols);
           }
         });
-        //button.addListener();
         board.set(i, j, button);
         this.add(button);
       }
@@ -141,21 +161,26 @@ public class Minesweeper extends JFrame {
 
   public void printBoard(Matrix<Cell> board, int rows, int cols) {
     Cell cell;
-    System.out.print("\033[H\033[2J");  
-    System.out.flush();  
+    System.out.print("\033[0;0H\033[2J");  
     for (int i = 0; i < rows; ++i) {
       for (int j = 0; j < cols; ++j) {
         cell = board.get(i,j);
         if (cell == null) continue;
-        if (!showSolution && cell.isEnabled()) {
-          System.out.print(UNKNOWN);
-        } else {
+        if (showSolution) {
           int d = Integer.parseInt(cell.getName());
           System.out.print(DIGIT[d]);
+        } else {
+          if (cell.isEnabled()) {
+            System.out.print(UNKNOWN);
+          } else {
+            int d = Integer.parseInt(cell.getName());
+            System.out.print(DIGIT[d]);
+          }
         }
       }
       System.out.println();
     }
+    System.out.flush();
   }
 
   public void floodBoard(Matrix<Cell> board, int rows, int cols, Cell s) {
