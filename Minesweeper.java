@@ -28,12 +28,13 @@ public class Minesweeper extends JFrame {
     restart.setBounds(30,3,100,25);
     restart.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        setVisible(false);
+        
         try {
-          Minesweeper ms = new Minesweeper(10, 20, 10);
+          new Minesweeper(rows, cols, mines);
         } catch (Minesweeper.InvalidNumberOfMines ex) {
           System.err.println("Invalid number of mines");
         }
+        setVisible(false);
       }
     });
     this.add(restart);
@@ -129,7 +130,7 @@ public class Minesweeper extends JFrame {
       randRow = (int)(Math.random() * rows);
       randCol = (int)(Math.random() * cols);
       Cell button = board.get(randRow, randCol);
-      if (button.getName().equals(mayority)) {
+      if (!button.getName().equals(minority)) {
         ++droppedMines;
         minesAround = 0;
         for (int[] d : DIR) {
